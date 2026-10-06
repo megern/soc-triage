@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "backend": "deterministic_rules",
+  "event_count": 7,
+  "findings": [
+    {
+      "rule": "repeated_login_failures",
+      "severity": "medium",
+      "user": "demo-account",
+      "source_ip": "192.0.2.1",
+      "evidence_ids": [
+        "demo-0",
+        "demo-1",
+        "demo-2",
+        "demo-3",
+        "demo-4"
+      ],
+      "first_seen": "2026-01-01T00:00:00+00:00",
+      "last_seen": "2026-01-01T00:00:40+00:00",
+      "reason": "5 failed logins within 300s",
+      "next_step": "Review authentication context before deciding to block the source."
+    },
+    {
+      "rule": "failures_then_success",
+      "severity": "high",
+      "user": "demo-account",
+      "source_ip": "192.0.2.1",
+      "evidence_ids": [
+        "demo-0",
+        "demo-1",
+        "demo-2",
+        "demo-3",
+        "demo-4",
+        "demo-5"
+      ],
+      "first_seen": "2026-01-01T00:00:00+00:00",
+      "last_seen": "2026-01-01T00:01:00+00:00",
+      "reason": "5 failed logins within 300s followed by success",
+      "next_step": "Check whether the user recognizes this source and inspect session activity."
+    },
+    {
+      "rule": "privilege_change",
+      "severity": "review",
+      "user": "demo-admin",
+      "source_ip": "192.0.2.2",
+      "evidence_ids": [
+        "demo-6"
+      ],
+      "first_seen": "2026-01-01T00:02:00+00:00",
+      "last_seen": "2026-01-01T00:02:00+00:00",
+      "reason": "A privilege grant was recorded; authorization is unknown.",
+      "next_step": "Compare with an approved change request."
+    }
+  ],
+  "timeline": [
+    {
+      "id": "demo-0",
+      "timestamp": "2026-01-01T00:00:00+00:00",
+      "kind": "login_failed",
+      "user": "demo-account",
+      "source_ip": "192.0.2.1"
+    },
+    {
+      "id": "demo-1",
+      "timestamp": "2026-01-01T00:00:10+00:00",
+      "kind": "login_failed",
+      "user": "demo-account",
+      "source_ip": "192.0.2.1"
+    },
+    {
+      "id": "demo-2",
+      "timestamp": "2026-01-01T00:00:20+00:00",
+      "kind": "login_failed",
+      "user": "demo-account",
+      "source_ip": "192.0.2.1"
+    },
+    {
+      "id": "demo-3",
+      "timestamp": "2026-01-01T00:00:30+00:00",
+      "kind": "login_failed",
+      "user": "demo-account",
+      "source_ip": "192.0.2.1"
+    },
+    {
+      "id": "demo-4",
+      "timestamp": "2026-01-01T00:00:40+00:00",
+      "kind": "login_failed",
+      "user": "demo-account",
+      "source_ip": "192.0.2.1"
+    },
+    {
+      "id": "demo-5",
+      "timestamp": "2026-01-01T00:01:00+00:00",
+      "kind": "login_success",
+      "user": "demo-account",
+      "source_ip": "192.0.2.1"
+    },
+    {
+      "id": "demo-6",
+      "timestamp": "2026-01-01T00:02:00+00:00",
+      "kind": "privilege_granted",
+      "user": "demo-admin",
+      "source_ip": "192.0.2.2"
+    }
+  ],
+  "limitations": [
+    "Rule matches are leads for investigation, not proof of compromise.",
+    "Events from different source/user pairs are not correlated.",
+    "No automated response or external network requests."
+  ]
+}

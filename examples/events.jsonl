@@ -1,0 +1,7 @@
+{"id": "demo-0", "timestamp": "2026-01-01T00:00:00Z", "kind": "login_failed", "user": "demo-account", "source_ip": "192.0.2.1"}
+{"id": "demo-1", "timestamp": "2026-01-01T00:00:10Z", "kind": "login_failed", "user": "demo-account", "source_ip": "192.0.2.1"}
+{"id": "demo-2", "timestamp": "2026-01-01T00:00:20Z", "kind": "login_failed", "user": "demo-account", "source_ip": "192.0.2.1"}
+{"id": "demo-3", "timestamp": "2026-01-01T00:00:30Z", "kind": "login_failed", "user": "demo-account", "source_ip": "192.0.2.1"}
+{"id": "demo-4", "timestamp": "2026-01-01T00:00:40Z", "kind": "login_failed", "user": "demo-account", "source_ip": "192.0.2.1"}
+{"id": "demo-5", "timestamp": "2026-01-01T00:01:00Z", "kind": "login_success", "user": "demo-account", "source_ip": "192.0.2.1"}
+{"id": "demo-6", "timestamp": "2026-01-01T00:02:00Z", "kind": "privilege_granted", "user": "demo-admin", "source_ip": "192.0.2.2"}
