@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from collections import defaultdict, deque
+from collections import Counter, defaultdict, deque
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -37,9 +37,10 @@ def analyze(events: list[dict], window_seconds: int = 300, failure_threshold: in
         groups[(event["source_ip"], event["user"])].append((stamp, event))
     findings = []
     for (source_ip, user), group in sorted(groups.items()):
-        failures = []
+        failures = deque()
         for stamp, event in group:
-            failures = [(t, e) for t, e in failures if (stamp - t).total_seconds() <= window_seconds]
+            while failures and (stamp - failures[0][0]).total_seconds() > window_seconds:
+                failures.popleft()
             if event["kind"] == "login_failed":
                 failures.append((stamp, event))
             if len(failures) >= failure_threshold and event["kind"] in {"login_failed", "login_success"}:
@@ -70,17 +71,22 @@ def analyze(events: list[dict], window_seconds: int = 300, failure_threshold: in
     if spray_threshold is not None:
         by_source = defaultdict(deque)
         latest = {}
+        account_counts = defaultdict(Counter)
         for stamp, event in ordered:
             if event["kind"] != "login_failed":
                 continue
             source = event["source_ip"]
             active = by_source[source]
             while active and (stamp - active[0][0]).total_seconds() > window_seconds:
-                active.popleft()
+                _, expired = active.popleft()
+                account_counts[source][expired["user"]] -= 1
+                if account_counts[source][expired["user"]] == 0:
+                    del account_counts[source][expired["user"]]
             active.append((stamp, event))
-            users = sorted({e["user"] for _, e in active})
-            if len(users) < spray_threshold:
+            account_counts[source][event["user"]] += 1
+            if len(account_counts[source]) < spray_threshold:
                 continue
+            users = sorted(account_counts[source])
             finding = {"rule": "cross_account_login_failures", "severity": "medium",
                        "source_ip": source, "users": users, "evidence_ids": [e["id"] for _, e in active],
                        "first_seen": active[0][0].isoformat(), "last_seen": stamp.isoformat(),

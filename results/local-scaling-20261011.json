@@ -1,0 +1,72 @@
+{
+  "source_sha256": {
+    "triage.py": "73515c7bb54aed138e40f722d1b9ae64759b96f72c7ff3b0fd6755d533772eb0",
+    "baseline": "ee595cba0746a1c2b6215f6c36fdb41654d79a64d0b4949e1dc8033d2c987309",
+    "benchmark": "1db7fe45789c5791dc4e2a19c8b074203cc6b2e8ee5030398c0bde048708ff97"
+  },
+  "python": "3.14.7",
+  "machine": "arm64",
+  "rows": [
+    {
+      "size": 1000,
+      "output_equivalent": true,
+      "seconds": {
+        "baseline": [
+          0.06595725007355213,
+          0.06484470888972282,
+          0.06430379208177328
+        ],
+        "candidate": [
+          0.001972875092178583,
+          0.0019429579842835665,
+          0.001981999957934022
+        ]
+      },
+      "median_seconds": {
+        "baseline": 0.06484470888972282,
+        "candidate": 0.001972875092178583
+      }
+    },
+    {
+      "size": 3000,
+      "output_equivalent": true,
+      "seconds": {
+        "baseline": [
+          0.5813368749804795,
+          0.5709320828318596,
+          0.5769893748220056
+        ],
+        "candidate": [
+          0.006545000011101365,
+          0.006406041793525219,
+          0.00625475007109344
+        ]
+      },
+      "median_seconds": {
+        "baseline": 0.5769893748220056,
+        "candidate": 0.006406041793525219
+      }
+    },
+    {
+      "size": 6000,
+      "output_equivalent": true,
+      "seconds": {
+        "baseline": [
+          2.5984279171098024,
+          2.6118413750082254,
+          2.847826332785189
+        ],
+        "candidate": [
+          0.012354667065665126,
+          0.014326625037938356,
+          0.01307937502861023
+        ]
+      },
+      "median_seconds": {
+        "baseline": 2.6118413750082254,
+        "candidate": 0.01307937502861023
+      }
+    }
+  ],
+  "scope": "Synthetic expiry-window timing with alerts suppressed. No production detection or end-to-end SOC throughput claim; emitting large evidence sets can still cost quadratic work."
+}
