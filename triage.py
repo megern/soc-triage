@@ -2,10 +2,45 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import hmac
 import json
 from collections import Counter, defaultdict, deque
 from datetime import datetime, timezone
 from pathlib import Path
+
+
+def pseudonymize_report(report: dict, key: bytes) -> dict:
+    """Share correlation evidence without exporting raw account/IP/event IDs.
+
+    This is pseudonymization, not anonymity: timestamps and event patterns remain.
+    Drop unrecognized event metadata instead of guessing which fields are private.
+    """
+    if not isinstance(key, bytes) or len(key) < 32:
+        raise ValueError("pseudonym key must contain at least 32 bytes")
+
+    def token(namespace, value):
+        digest = hmac.new(key, (namespace + '\0' + value).encode(), hashlib.sha256).hexdigest()
+        return namespace + '-' + digest
+
+    findings = []
+    for finding in report['findings']:
+        item = {k: finding[k] for k in ('rule', 'severity', 'first_seen', 'last_seen', 'reason', 'next_step')}
+        for field in ('user', 'source_ip'):
+            if field in finding:
+                item[field] = token(field, finding[field])
+        if 'users' in finding:
+            item['users'] = [token('user', value) for value in finding['users']]
+        item['evidence_ids'] = [token('event', value) for value in finding['evidence_ids']]
+        findings.append(item)
+    timeline = [{'id': token('event', event['id']), 'timestamp': event['timestamp'],
+                 'kind': event['kind'], 'user': token('user', event['user']),
+                 'source_ip': token('source_ip', event['source_ip'])} for event in report['timeline']]
+    return {'schema_version': report['schema_version'], 'backend': report['backend'],
+            'event_count': report['event_count'], 'findings': findings, 'timeline': timeline,
+            'privacy': 'HMAC-SHA256 pseudonyms; extra event fields omitted; key not exported',
+            'limitations': report['limitations'] + [
+                'Pseudonymized records remain sensitive: timestamps, kinds and correlation patterns are retained.']}
 
 
 def parse_time(value: str) -> datetime:
@@ -113,12 +148,18 @@ def main() -> None:
     parser.add_argument("--window-seconds", type=int, default=300)
     parser.add_argument("--failure-threshold", type=int, default=5)
     parser.add_argument("--spray-threshold", type=int, help="Opt-in distinct-account threshold at one source")
+    parser.add_argument("--pseudonym-key-file", type=Path,
+                        help="Optional local secret file (at least 32 bytes) for a pseudonymized report")
     args = parser.parse_args()
     if args.events.resolve() == args.output.resolve():
         parser.error("The report output must not overwrite the input events file.")
+    if args.pseudonym_key_file and args.pseudonym_key_file.resolve() == args.output.resolve():
+        parser.error("The report output must not overwrite the pseudonym key file.")
     try:
         events = [json.loads(line) for line in args.events.read_text().splitlines() if line.strip()]
         report = analyze(events, args.window_seconds, args.failure_threshold, args.spray_threshold)
+        if args.pseudonym_key_file:
+            report = pseudonymize_report(report, args.pseudonym_key_file.read_bytes())
     except (OSError, ValueError, TypeError) as exc:
         parser.exit(2, f"Input error: {exc}\n")
     args.output.parent.mkdir(parents=True, exist_ok=True)

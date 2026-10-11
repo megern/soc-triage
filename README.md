@@ -1,5 +1,19 @@
 # SOC Triage
 
+## Sharing an investigation report (local development)
+
+`--pseudonym-key-file /absolute/local/key` replaces account names, source IPs,
+event IDs and evidence references with deterministic HMAC-SHA256 pseudonyms.
+Supply a locally generated random secret containing at least 32 bytes; retain
+it locally and never commit it. The same key preserves correlation across
+reports; different keys produce different identifiers. Extra event metadata is
+omitted from this export. The input events and key file cannot be overwritten
+by the report destination.
+
+This is pseudonymization, not anonymity: timestamps, event kinds and activity
+patterns remain sensitive. Review the export before sharing it. The tool does
+not send records or keys anywhere. The ordinary full report remains the default.
+
 ## Public preview v0.2.0
 
 Python 3.11+; commands below use a local Mac/Linux shell. Source and reports are public; this is a research/development preview, not a production-security certification.
