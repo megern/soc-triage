@@ -13,8 +13,17 @@ Each JSONL event has `id`, an offset-aware ISO timestamp, `kind`, `user`, and `s
 
 Five failures inside 300 seconds produce a medium-priority lead; a success inside that window produces a high-priority lead. The output preserves evidence and suggested investigation steps. This is a deterministic baseline intended for comparison with a later local language-model assistant. It makes no network requests and takes no response actions.
 
-The included events are synthetic. This prototype has no production SIEM integration, cross-account correlation, or measured analyst-time benefit. The test suite checks exact evidence, expired windows, separation between users, and input validation.
+The included events are synthetic. This prototype has no production SIEM integration or measured analyst-time benefit. The test suite checks exact evidence, expired windows, separation between users, and input validation.
 
 ## العربية
 
 أداة محلية تربط أحداث تسجيل الدخول بالحساب والمصدر، وتعرض سبب التنبيه ومعرّفات السجلات الأصلية. البيانات المرفقة اصطناعية؛ النتائج خيوط للتحقيق وليست إثباتًا على اختراق.
+
+## Optional cross-account correlation
+
+```sh
+python3 triage.py examples/events.jsonl --spray-threshold 5 --failure-threshold 5 --output /tmp/triage.json
+python3 -m unittest discover -s .
+```
+
+`--spray-threshold` opts into distinct-account failure correlation from the same source within the configured time window. Its minimum is two accounts. The default keeps the original per-account behavior. Findings include exact event IDs, affected accounts and timestamps. A shared NAT or proxy can create false positives; investigate the lead before taking action. This is a rule baseline on synthetic examples, not measured production detection.
