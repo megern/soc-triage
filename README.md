@@ -1,5 +1,11 @@
 # SOC Triage
 
+## Version 1.0.0
+
+Persistent investigation casebook. Transactional deduplicated imports, conflicting-ID rejection, case ownership, review history and reopening closed cases on new evidence. Four states: open, investigating, closed, false_positive. Event batches <=16 MiB, casebook <=100000 events. Database and exported notes are private investigation data; the existing pseudonymized triage export remains separate. Historical cases are retained if rule settings change. No SIEM connector, blocking action or compromise certification.
+
+See the [complete local workflow](docs/v1-workflow.md) for installation, commands, review artifacts and limits. Earlier preview notes below describe their historical tagged revisions.
+
 ## Sharing an investigation report (local development)
 
 `--pseudonym-key-file /absolute/local/key` replaces account names, source IPs,

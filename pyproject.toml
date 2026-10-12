@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "soc-triage"
-version = "0.2.0"
+version = "1.0.0"
 description = "SOC authentication-event triage"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -15,8 +15,9 @@ Repository = "https://github.com/megern/soc-triage"
 Issues = "https://github.com/megern/soc-triage/issues"
 
 [project.scripts]
+soc-casebook = "casebook:main"
 soc-triage = "triage:main"
 
 [tool.setuptools]
-py-modules = ["triage"]
+py-modules = ["casebook", "soc_report_bundle", "triage"]
 
